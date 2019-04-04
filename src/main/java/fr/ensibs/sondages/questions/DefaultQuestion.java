@@ -31,7 +31,7 @@ public class DefaultQuestion implements Question, Entry {
     public Answer makeResponseForm() {
         Answer a = null;
         try {
-            a = answer.getConstructor(Integer.class).newInstance(this.id);
+            a = answer.getConstructor(UUID.class).newInstance(this.id);
         } catch (Exception e) {
             e.printStackTrace();
         }

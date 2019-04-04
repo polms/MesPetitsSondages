@@ -17,6 +17,7 @@ public class Connector {
             this.context = new InitialContext();
             ConnectionFactory factory = (ConnectionFactory) context.lookup("ConnectionFactory");
             this.connection = factory.createConnection();
+            this.connection.start();
         } catch (NamingException | JMSException e) {
             e.printStackTrace();
         }
@@ -31,7 +32,7 @@ public class Connector {
 
     public Session createSession() {
         try {
-            return this.connection.createSession(false, Session.CLIENT_ACKNOWLEDGE);
+            return this.connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         } catch (JMSException e) {
             e.printStackTrace();
         }
