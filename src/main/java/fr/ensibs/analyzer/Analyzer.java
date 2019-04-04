@@ -1,6 +1,14 @@
 package fr.ensibs.analyzer;
 
+import java.rmi.RemoteException;
+import java.util.HashMap;
+import java.util.Map;
+
 import fr.ensibs.river.RiverLookup;
+import fr.ensibs.sondages.questions.Answer;
+import fr.ensibs.sondages.questions.AnswerBounded;
+import fr.ensibs.sondages.questions.AnswerFree;
+import fr.ensibs.sondages.questions.AnswerYesNo;
 import net.jini.space.JavaSpace;
 
 public class Analyzer {
@@ -19,6 +27,11 @@ public class Analyzer {
 	 * The JavaSpace containing the data
 	 */
 	private JavaSpace space;
+	
+	/**
+	 * The Map associating an id with a report
+	 */
+	private Map<Integer, Report> list = new HashMap<>();
 		
 	/**
 	 * Print a usage message and exit
@@ -71,6 +84,31 @@ public class Analyzer {
 		RiverLookup rl = new RiverLookup();
 		this.space = rl.lookup(this.hostName, this.portNumber, JavaSpace.class);
 		
+		Answer tmpFree = new AnswerFree();
+		Answer tmpYesNo = new AnswerYesNo();
+		Answer tmpBounded = new AnswerBounded();
+		EntryListener listenerFree = new EntryListener(tmpFree);
+		EntryListener listenerYesNo = new EntryListener(tmpYesNo);
+		EntryListener listenerBounded = new EntryListener(tmpBounded);
+		this.space.notify(tmpFree, null, listenerFree, Long.MAX_VALUE, null);
+		this.space.notify(tmpYesNo, null, listenerYesNo, Long.MAX_VALUE, null);
+		this.space.notify(tmpBounded, null, listenerBounded, Long.MAX_VALUE, null);
+		while(true) {
+			
+		}
+		
 	}
+	
+	public void analyzeFree() {
+		
+	}
+	
+	public void analyzeYesNo() {
+		
+	}
+	
+	public void analyzeBounded() {
+	
+}
 
 }

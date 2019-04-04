@@ -9,5 +9,11 @@ public abstract class Report implements Serializable {
 	private int nbAnswers;
 	
 	private int nbNoAnswers;
+	
+	public Report() {}
+	
+	public Report(String question) {
+		this.question = question;
+	}
 
 }
