@@ -1,5 +1,7 @@
 package fr.ensibs.analyzer;
 
+import java.util.UUID;
+
 /**
  * Represents a report for a bounded question
  * 
@@ -7,7 +9,7 @@ package fr.ensibs.analyzer;
  *
  */
 public class ReportBounded extends Report {
-	
+
 	/**
 	 * The array with the number of each answer between 1 and 5
 	 */
@@ -17,6 +19,15 @@ public class ReportBounded extends Report {
 	 * The average of the answers
 	 */
 	private int average;
+	
+	/**
+	 * Constructor
+	 * 
+	 * @param id the question id
+	 */
+	public ReportBounded(UUID id) {
+		super(id);
+	}
 	
 	/**
 	 * Adds an answer to the array

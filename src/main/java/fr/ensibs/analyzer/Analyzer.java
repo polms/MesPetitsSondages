@@ -107,10 +107,15 @@ public class Analyzer {
 	 * 
 	 * @throws Exception 
 	 */
-	public void run() throws Exception {
+	public void run() {
 		
-		RiverLookup rl = new RiverLookup();
-		this.space = rl.lookup(this.hostName, this.portNumber, JavaSpace.class);
+		RiverLookup rl;
+		try {
+			rl = new RiverLookup();
+			this.space = rl.lookup(this.hostName, this.portNumber, JavaSpace.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		Answer tmpFree = new AnswerFree();
 		Answer tmpYesNo = new AnswerYesNo();
@@ -118,9 +123,13 @@ public class Analyzer {
 		EntryListener listenerFree = new EntryListener(tmpFree, this);
 		EntryListener listenerYesNo = new EntryListener(tmpYesNo, this);
 		EntryListener listenerBounded = new EntryListener(tmpBounded, this);
-		this.space.notify(tmpFree, null, listenerFree, Long.MAX_VALUE, null);
-		this.space.notify(tmpYesNo, null, listenerYesNo, Long.MAX_VALUE, null);
-		this.space.notify(tmpBounded, null, listenerBounded, Long.MAX_VALUE, null);
+		try {
+			this.space.notify(tmpFree, null, listenerFree, Long.MAX_VALUE, null);
+			this.space.notify(tmpYesNo, null, listenerYesNo, Long.MAX_VALUE, null);
+			this.space.notify(tmpBounded, null, listenerBounded, Long.MAX_VALUE, null);
+		} catch (RemoteException | TransactionException e) {
+			e.printStackTrace();
+		}
 		
 		createResponseQueue();
 		
@@ -213,7 +222,7 @@ public class Analyzer {
 			report = (ReportFree) this.list.get(id);
 		}
 		else {
-			report = new ReportFree();
+			report = new ReportFree(id);
 			this.list.put(id, report);
 		}
 		report.incrementNbAnswers();
@@ -232,7 +241,7 @@ public class Analyzer {
 			report = (ReportYesNo) this.list.get(id);
 		}
 		else {
-			report = new ReportYesNo();
+			report = new ReportYesNo(id);
 			this.list.put(id, report);
 		}
 		report.incrementNbAnswers();
@@ -254,7 +263,7 @@ public class Analyzer {
 			report = (ReportBounded) this.list.get(id);
 		}
 		else {
-			report = new ReportBounded();
+			report = new ReportBounded(id);
 			this.list.put(id, report);
 		}
 		report.incrementNbAnswers();

@@ -1,5 +1,7 @@
 package fr.ensibs.analyzer;
 
+import java.util.UUID;
+
 /**
  * Represents a report for a yes/no question
  * 
@@ -7,6 +9,15 @@ package fr.ensibs.analyzer;
  *
  */
 public class ReportYesNo extends Report {
+	
+	/**
+	 * Constructor
+	 * 
+	 * @param id the question id
+	 */
+	public ReportYesNo(UUID id) {
+		super(id);
+	}
 
 	/**
 	 * The number of positive answers
