@@ -258,6 +258,7 @@ public class Analyzer {
 			this.list.put(id, report);
 		}
 		report.incrementNbAnswers();
+		report.addAnswer(answer.response);
 	}
 	
 	/**

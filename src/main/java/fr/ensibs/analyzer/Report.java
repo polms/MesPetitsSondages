@@ -13,7 +13,7 @@ public abstract class Report implements Serializable {
 	/**
 	 * The number of answers to the question
 	 */
-	private int nbAnswers = 0;
+	int nbAnswers = 0;
 		
 	/**
 	 * Increments by 1 the number of answers

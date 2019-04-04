@@ -1,9 +1,53 @@
 package fr.ensibs.analyzer;
 
+/**
+ * Represents a report for a bounded question
+ * 
+ * @author Maxime
+ *
+ */
 public class ReportBounded extends Report {
 	
-	private int moyenne;
+	/**
+	 * The array with the number of each answer between 1 and 5
+	 */
+	private int[] answers = new int[5];
 	
-	private int ecarttype;
+	/**
+	 * The average of the answers
+	 */
+	private int average;
+	
+	public void addAnswer(int answer) {
+		answers[answer]++;
+		average(answer);
+	}
+	
+	/**
+	 * Calcute the average
+	 * 
+	 * @param answer
+	 */
+	private void average(int answer) {
+		this.average = ((average * nbAnswers-1) + answer) / nbAnswers;
+	}
+	
+	/**
+	 * Gets the array of answers
+	 * 
+	 * @return the array of answers
+	 */
+	public int[] getAnswers() {
+		return this.answers;
+	}
+	
+	/**
+	 * Gets the average
+	 * 
+	 * @return the average
+	 */
+	public int getAverage() {
+		return this.average;
+	}
 
 }
