@@ -45,7 +45,10 @@ public class DefaultQuestion<T extends Answer> implements Question, Entry {
                     System.out.print(f.getName() + "<" + f.getType().getSimpleName() + ">: ");
                     try {
                         if (f.getType() == Integer.class) {
-                            f.set(a, reader.nextInt());
+                            int nb = reader.nextInt();
+                            if (nb < 0 || nb > 5)
+                                continue;
+                            f.set(a, nb);
                         } else if (f.getType() == String.class) {
                             f.set(a, reader.nextLine());
                         } else if (f.getType() == Boolean.class) {
