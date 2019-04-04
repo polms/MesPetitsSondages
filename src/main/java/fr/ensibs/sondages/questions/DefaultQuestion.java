@@ -6,6 +6,10 @@ import java.lang.reflect.Field;
 import java.util.Scanner;
 import java.util.UUID;
 
+/**
+ * A question
+ * @param <T> the type of answer
+ */
 public class DefaultQuestion<T extends Answer> implements Question, Entry {
     public UUID id;
     public String question;
@@ -13,6 +17,11 @@ public class DefaultQuestion<T extends Answer> implements Question, Entry {
 
     public DefaultQuestion() {}
 
+    /**
+     * Constructor
+     * @param question to ask
+     * @param answer the type of answer
+     */
     public DefaultQuestion(String question, Class<T> answer) {
         this.id = UUID.randomUUID();
         this.question = question;

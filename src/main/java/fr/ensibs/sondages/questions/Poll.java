@@ -9,11 +9,15 @@ import net.jini.space.JavaSpace;
 import javax.jms.*;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.UUID;
 
 
+/**
+ * A class to create and register Questions/Answers
+ *
+ * Questions are sent to a JMS Topic.
+ * Answers are saved to the JavaSpace.
+ */
 public class Poll {
-
     private final JavaSpace javaSpace;
     private final Session session;
     private final Session listen;
@@ -22,6 +26,10 @@ public class Poll {
     private ArrayList<Question> questions;
     public static final String TOPIC_NAME = "QUESTIONS";
 
+    /**
+     * Constructor
+     * @param javaSpace can be null
+     */
     public Poll(JavaSpace javaSpace) {
         this.javaSpace = javaSpace;
         this.questions = new ArrayList<>();
@@ -46,6 +54,14 @@ public class Poll {
         }
     }
 
+    /**
+     * Register a question.
+     *
+     * @param question text of the question
+     * @param response_type the class used for the response. (Free/YesNo/Bounded)
+     * @return the created question
+     * @throws Exception thrown if the response_type is not correct
+     */
      public Question ask(String question, Class response_type) throws Exception {
         if (! Answer.class.isAssignableFrom(response_type))
             throw new Exception("Response type is not an answer");
@@ -67,15 +83,30 @@ public class Poll {
         return q;
     }
 
+    /**
+     * Answer a question.
+     *
+     * If the question is no longer waiting for an answer, ignore the answer.
+     * otherwise store it in the JavaSpace
+     * @param answer the answer
+     */
     public void answer(Answer answer) {
+        if (this.javaSpace == null)
+            return;
+        if (! this.questions.removeIf(q -> q.getID().equals(answer.question_id)))
+            return; // no questions for this answer. Ignore.
         try {
             this.javaSpace.write(answer, null, Lease.FOREVER);
-            this.questions.removeIf(q -> q.getID().equals(answer.question_id));
         } catch (TransactionException | RemoteException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Get the questions yet to be answered
+     *
+     * @return a list of questions
+     */
     public ArrayList<Question> getQuestions() {
         return this.questions;
     }
