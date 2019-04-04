@@ -2,21 +2,23 @@ package fr.ensibs.sondages.questions;
 
 import net.jini.core.entry.Entry;
 
+import java.util.UUID;
+
 public class DefaultQuestion implements Question, Entry {
-    public Integer id;
+    public UUID id;
     public String question;
     public Class<Answer> answer;
 
     public DefaultQuestion() {}
 
-    public DefaultQuestion(int id, String question, Class<Answer> answer) {
-        this.id = id;
+    public DefaultQuestion(String question, Class<Answer> answer) {
+        this.id = UUID.randomUUID();
         this.question = question;
         this.answer = answer;
     }
 
     @Override
-    public int getID() {
+    public UUID getID() {
         return this.id;
     }
 
