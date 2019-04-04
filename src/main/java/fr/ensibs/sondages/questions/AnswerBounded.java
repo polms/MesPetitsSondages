@@ -1,5 +1,5 @@
 package fr.ensibs.sondages.questions;
 
-public class ResponseBounded {
+public class AnswerBounded extends Answer {
     public Integer response;
 }

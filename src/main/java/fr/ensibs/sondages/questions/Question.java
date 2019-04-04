@@ -1,7 +1,9 @@
 package fr.ensibs.sondages.questions;
 
+import java.util.UUID;
+
 public interface Question {
-    public int getID();
+    public UUID getID();
     public String getQuestion();
     public Answer makeResponseForm();
 }
