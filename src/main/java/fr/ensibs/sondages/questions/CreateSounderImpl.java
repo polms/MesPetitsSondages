@@ -133,6 +133,8 @@ public class CreateSounderImpl implements CreateSounder {
 				for(int j=0; j<q.size();j++) {
 					if (q.get(j).getID().equals(question)) {
 						ObjectMessage message = this.session.createObjectMessage(question);
+						message.setJMSReplyTo(this.queue);
+						producer.send(message);
 					}
 				}
 			}

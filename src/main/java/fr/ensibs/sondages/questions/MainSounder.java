@@ -27,8 +27,8 @@ public class MainSounder {
 	
 	private static void usage()
 	{
-		System.out.println("Usage: java -jar target/analyzer-1.0.jar <server_host> <server_port>");
-		System.out.println("Launch the analyzer");
+		System.out.println("Usage: java -jar target/MainSounder-1.0.jar <server_host> <server_port>");
+		System.out.println("Launch the sounder");
 		System.out.println("with:");
 		System.out.println("<server_host> the name of the server host");
 		System.out.println("<server_port> the number of the server port");
@@ -62,14 +62,14 @@ public class MainSounder {
 
 	
 	public void run() throws Exception {
-			
+		receiveQueue();
 		   System.out.println("Enter commands:"
 	                + "\n CREATE*<name>                                             to create a new questioner"
 	                + "\n CREATEQUESTION*<question>*<name>                          to ask a new question"
 	                + "\n LISTQUESTION*<name>                                       to obtain all the question of the user"
 	                + "\n GETANSWER*<name>                                          to obtain an answer"
 	                );
-
+		   
 	        Scanner scanner = new Scanner(System.in);
 	        String line = scanner.nextLine();
 	        while (!line.toLowerCase().equals("quit")) {
