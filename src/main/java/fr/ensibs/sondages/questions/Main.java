@@ -3,6 +3,7 @@ package fr.ensibs.sondages.questions;
 import fr.ensibs.river.RiverLookup;
 import net.jini.space.JavaSpace;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
@@ -48,12 +49,28 @@ public class Main {
                             System.err.println("Unknown command: ADD \"" + command[1] + "\"");
                     }
                     break;
-                case "ASK":
-                    this.poll.ask("Toto est il le meilleur ?", AnswerYesNo.class);
+                case "ASK": {
+                    this.poll.ask(command[1], Class.forName("fr.ensibs.sondages.questions."+command[2]));
+                }
                     break;
-                case "LIST":
-                case "ANSWER":
-                    System.out.println("nop");
+                case "LIST": {
+                    ArrayList<Question> questions = this.poll.getQuestions();
+                    if (questions.size() == 0)
+                        System.out.println("No questions");
+                    int i = 0;
+                    for (Question q : questions) {
+                        System.out.println("Question " + i + " :" + q.getQuestion());
+                        i++;
+                    }
+                }
+                    break;
+                case "ANSWER": {
+                    ArrayList<Question> questions = this.poll.getQuestions();
+                    DefaultQuestion q = (DefaultQuestion)questions.get(Integer.parseInt(command[1]));
+                    Answer a = q.makeResponseForm();
+                    scanner = new Scanner(System.in);
+                    poll.answer(a);
+                }
                     break;
                 default:
                     System.err.println("Unknown command: \"" + command[0] + "\"");

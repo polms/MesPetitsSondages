@@ -6,7 +6,6 @@ import java.util.UUID;
 
 public abstract class Answer implements Entry {
     public UUID question_id;
-    public Boolean no_responce;
 
     public Answer() {}
 

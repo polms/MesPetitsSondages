@@ -8,6 +8,8 @@ import net.jini.space.JavaSpace;
 
 import javax.jms.*;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.UUID;
 
 
 public class Poll {
@@ -17,10 +19,12 @@ public class Poll {
     private final Session listen;
     private MessageConsumer listenConsumer;
     private final Topic topic;
+    private ArrayList<Question> questions;
     public static final String TOPIC_NAME = "QUESTIONS";
 
     public Poll(JavaSpace javaSpace) {
         this.javaSpace = javaSpace;
+        this.questions = new ArrayList<>();
         Connector connector = Connector.getInstance();
         this.session = connector.createSession();
         this.listen  = connector.createSession();
@@ -32,6 +36,7 @@ public class Poll {
                 try {
                     Question q = message.getBody(Question.class);
                     System.out.println("New Question ("+q.getID()+"):"+q.getQuestion());
+                    questions.add(q);
                 } catch (JMSException e) {
                     e.printStackTrace();
                 }
@@ -41,24 +46,37 @@ public class Poll {
         }
     }
 
-    public int ask(String question, Class response_type) throws Exception {
+     public Question ask(String question, Class response_type) throws Exception {
         if (! Answer.class.isAssignableFrom(response_type))
             throw new Exception("Response type is not an answer");
-        Question q = new DefaultQuestion(question, response_type);
+        Question q = null;
+        if (response_type == AnswerFree.class)
+            q = new DefaultQuestion<AnswerFree>(question, response_type);
+        else if (response_type == AnswerYesNo.class)
+            q = new DefaultQuestion<AnswerYesNo>(question, response_type);
+        else if (response_type == AnswerBounded.class)
+            q = new DefaultQuestion<AnswerBounded>(question, response_type);
+        else
+            throw new Exception("Response type not in use");
         try {
             MessageProducer producer =this.session.createProducer(this.topic);
             producer.send(this.session.createObjectMessage(q));
         } catch (JMSException e) {
             e.printStackTrace();
         }
-        return 0;
+        return q;
     }
 
     public void answer(Answer answer) {
         try {
             this.javaSpace.write(answer, null, Lease.FOREVER);
+            this.questions.removeIf(q -> q.getID().equals(answer.question_id));
         } catch (TransactionException | RemoteException e) {
             e.printStackTrace();
         }
+    }
+
+    public ArrayList<Question> getQuestions() {
+        return this.questions;
     }
 }
