@@ -1,10 +1,22 @@
 package fr.ensibs.analyzer;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
+import javax.jms.MessageProducer;
+import javax.jms.ObjectMessage;
+import javax.jms.Queue;
+import javax.jms.Session;
+
+import fr.ensibs.joram.Connector;
+import fr.ensibs.joram.Helper;
 import fr.ensibs.river.RiverLookup;
 import fr.ensibs.sondages.questions.Answer;
 import fr.ensibs.sondages.questions.AnswerBounded;
@@ -30,6 +42,11 @@ public class Analyzer {
 	 * The JavaSpace containing the data
 	 */
 	private JavaSpace space;
+	
+	/**
+	 * The response queue listening for requests
+	 */
+	private Queue queue;
 	
 	/**
 	 * The Map associating an question id with a report
@@ -96,10 +113,49 @@ public class Analyzer {
 		this.space.notify(tmpFree, null, listenerFree, Long.MAX_VALUE, null);
 		this.space.notify(tmpYesNo, null, listenerYesNo, Long.MAX_VALUE, null);
 		this.space.notify(tmpBounded, null, listenerBounded, Long.MAX_VALUE, null);
+		
+		createResponseQueue();
+		
 		while(true) {
 			
 		}
 		
+	}
+	
+	private void createResponseQueue() {
+		System.setProperty("java.naming.factory.initial", "fr.dyade.aaa.jndi2.client.NamingContextFactory");
+		System.setProperty("java.naming.factory.host", this.hostName);
+		System.setProperty("java.naming.factory.port", String.valueOf(this.portNumber));
+		
+		Session session = Connector.getInstance().createSession();
+		
+		this.queue = Helper.getQueue(session, "response");
+		
+		Session sessionListener = Connector.getInstance().createSession();
+		try {
+			MessageConsumer consumer = sessionListener.createConsumer(this.queue);
+			consumer.setMessageListener(new MessageListener() {
+				@Override
+				public void onMessage(Message message) {
+					try {
+						reply(session, message);
+					} catch (JMSException e) {
+						e.printStackTrace();
+					}
+				}
+		    });  
+		} catch (JMSException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void reply(Session session, Message msg) throws JMSException {
+		ObjectMessage message = (ObjectMessage) msg;
+		UUID uuid = (UUID) message.getObject();
+		Report report = this.list.get(uuid);
+		ObjectMessage response = session.createObjectMessage(report);
+		MessageProducer producer = session.createProducer(message.getJMSReplyTo());
+		producer.send(response);
 	}
 	
 	public void readAnswer(Answer tmp) {
