@@ -16,22 +16,14 @@ public class EntryListener implements RemoteEventListener {
 	
 	private Answer answer;
 	
-	public EntryListener(Answer answer) {
+	public EntryListener(Answer answer, Analyzer analyzer) {
 		this.analyzer = analyzer;
 		this.answer = answer;
 	}
 
 	@Override
 	public void notify(RemoteEvent event) throws UnknownEventException, RemoteException {
-		if(answer instanceof AnswerFree) {
-			this.analyzer.analyzeFree();
-		}
-		else if(answer instanceof AnswerYesNo) {
-			this.analyzer.analyzeYesNo();
-		}
-		else if(answer instanceof AnswerBounded) {
-			this.analyzer.analyzeBounded();
-		}
+		this.analyzer.readAnswer(answer);
 	}
 
 }

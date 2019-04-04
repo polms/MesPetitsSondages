@@ -3,12 +3,15 @@ package fr.ensibs.analyzer;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import fr.ensibs.river.RiverLookup;
 import fr.ensibs.sondages.questions.Answer;
 import fr.ensibs.sondages.questions.AnswerBounded;
 import fr.ensibs.sondages.questions.AnswerFree;
 import fr.ensibs.sondages.questions.AnswerYesNo;
+import net.jini.core.entry.UnusableEntryException;
+import net.jini.core.transaction.TransactionException;
 import net.jini.space.JavaSpace;
 
 public class Analyzer {
@@ -29,9 +32,9 @@ public class Analyzer {
 	private JavaSpace space;
 	
 	/**
-	 * The Map associating an id with a report
+	 * The Map associating an question id with a report
 	 */
-	private Map<Integer, Report> list = new HashMap<>();
+	private Map<UUID, Report> list = new HashMap<>();
 		
 	/**
 	 * Print a usage message and exit
@@ -87,9 +90,9 @@ public class Analyzer {
 		Answer tmpFree = new AnswerFree();
 		Answer tmpYesNo = new AnswerYesNo();
 		Answer tmpBounded = new AnswerBounded();
-		EntryListener listenerFree = new EntryListener(tmpFree);
-		EntryListener listenerYesNo = new EntryListener(tmpYesNo);
-		EntryListener listenerBounded = new EntryListener(tmpBounded);
+		EntryListener listenerFree = new EntryListener(tmpFree, this);
+		EntryListener listenerYesNo = new EntryListener(tmpYesNo, this);
+		EntryListener listenerBounded = new EntryListener(tmpBounded, this);
 		this.space.notify(tmpFree, null, listenerFree, Long.MAX_VALUE, null);
 		this.space.notify(tmpYesNo, null, listenerYesNo, Long.MAX_VALUE, null);
 		this.space.notify(tmpBounded, null, listenerBounded, Long.MAX_VALUE, null);
@@ -99,16 +102,68 @@ public class Analyzer {
 		
 	}
 	
-	public void analyzeFree() {
-		
+	public void readAnswer(Answer tmp) {
+		Answer answer = null;
+		try {
+			answer = (Answer) this.space.readIfExists(tmp, null, Long.MAX_VALUE);
+		} catch (RemoteException | UnusableEntryException | TransactionException | InterruptedException e) {
+			e.printStackTrace();
+		}
+		if(answer != null) {
+			if(answer instanceof AnswerFree) {
+				analyzeFree((AnswerFree) answer);
+			}
+			else if(answer instanceof AnswerYesNo) {
+				analyzeYesNo((AnswerYesNo) answer);
+			}
+			else if(answer instanceof AnswerBounded) {
+				analyzeBounded((AnswerBounded) answer);
+			}
+		}	
 	}
 	
-	public void analyzeYesNo() {
-		
+	private void analyzeFree(AnswerFree answer) {
+		UUID id = answer.question_id;
+		ReportFree report;
+		if(this.list.containsKey(id)) {
+			report = (ReportFree) this.list.get(id);
+		}
+		else {
+			report = new ReportFree();
+			this.list.put(id, report);
+		}
+		report.incrementNbAnswers();
+		report.addAnswer(answer.response);
 	}
 	
-	public void analyzeBounded() {
-	
-}
+	private void analyzeYesNo(AnswerYesNo answer) {
+		UUID id = answer.question_id;
+		ReportYesNo report;
+		if(this.list.containsKey(id)) {
+			report = (ReportYesNo) this.list.get(id);
+		}
+		else {
+			report = new ReportYesNo();
+			this.list.put(id, report);
+		}
+		report.incrementNbAnswers();
+		if(answer.response)
+			report.incrementNbYes();
+		else
+			report.incrementNbNo();
+	}
+
+	private void analyzeBounded(AnswerBounded answer) {
+		UUID id = answer.question_id;
+		Report report;
+		if(this.list.containsKey(id)) {
+			report = this.list.get(id);
+		}
+		else {
+			report = new ReportBounded();
+			this.list.put(id, report);
+		}
+		report.incrementNbAnswers();
+	}
 
 }
