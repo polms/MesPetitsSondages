@@ -23,6 +23,9 @@ import fr.ensibs.sondages.questions.AnswerBounded;
 import fr.ensibs.sondages.questions.AnswerFree;
 import fr.ensibs.sondages.questions.AnswerYesNo;
 import net.jini.core.entry.UnusableEntryException;
+import net.jini.core.event.RemoteEvent;
+import net.jini.core.event.RemoteEventListener;
+import net.jini.core.event.UnknownEventException;
 import net.jini.core.transaction.TransactionException;
 import net.jini.space.JavaSpace;
 
@@ -220,6 +223,24 @@ public class Analyzer {
 			this.list.put(id, report);
 		}
 		report.incrementNbAnswers();
+	}
+	
+	class EntryListener implements RemoteEventListener {
+		
+		private Analyzer analyzer;
+		
+		private Answer answer;
+		
+		public EntryListener(Answer answer, Analyzer analyzer) {
+			this.analyzer = analyzer;
+			this.answer = answer;
+		}
+
+		@Override
+		public void notify(RemoteEvent event) throws UnknownEventException, RemoteException {
+			this.analyzer.readAnswer(answer);
+		}
+
 	}
 
 }
