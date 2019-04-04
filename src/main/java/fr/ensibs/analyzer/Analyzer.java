@@ -1,6 +1,5 @@
 package fr.ensibs.analyzer;
 
-import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +28,12 @@ import net.jini.core.event.UnknownEventException;
 import net.jini.core.transaction.TransactionException;
 import net.jini.space.JavaSpace;
 
+/**
+ * Analyzes answers to questions and make reports
+ * 
+ * @author Maxime
+ *
+ */
 public class Analyzer {
 	
 	/**
@@ -125,6 +130,9 @@ public class Analyzer {
 		
 	}
 	
+	/**
+	 * Create a queue listening to reports requests
+	 */
 	private void createResponseQueue() {
 		System.setProperty("java.naming.factory.initial", "fr.dyade.aaa.jndi2.client.NamingContextFactory");
 		System.setProperty("java.naming.factory.host", this.hostName);
@@ -152,6 +160,13 @@ public class Analyzer {
 		}
 	}
 	
+	/**
+	 * Reply to a request with the asked report
+	 * 
+	 * @param session the queue session
+	 * @param msg the received message
+	 * @throws JMSException
+	 */
 	private void reply(Session session, Message msg) throws JMSException {
 		ObjectMessage message = (ObjectMessage) msg;
 		UUID uuid = (UUID) message.getObject();
@@ -161,6 +176,11 @@ public class Analyzer {
 		producer.send(response);
 	}
 	
+	/**
+	 * Read an answer from the JavaSpace
+	 * 
+	 * @param tmp the template of an answer
+	 */
 	public void readAnswer(Answer tmp) {
 		Answer answer = null;
 		try {
@@ -181,6 +201,11 @@ public class Analyzer {
 		}	
 	}
 	
+	/**
+	 * Analyzes an AnswerFree and updates the report corresponding to the question
+	 * 
+	 * @param answer the answer to analyze
+	 */
 	private void analyzeFree(AnswerFree answer) {
 		UUID id = answer.question_id;
 		ReportFree report;
@@ -195,6 +220,11 @@ public class Analyzer {
 		report.addAnswer(answer.response);
 	}
 	
+	/**
+	 * Analyzes an AnswerYesNo and updates the report corresponding to the question
+	 * 
+	 * @param answer the answer to analyze
+	 */
 	private void analyzeYesNo(AnswerYesNo answer) {
 		UUID id = answer.question_id;
 		ReportYesNo report;
@@ -212,11 +242,16 @@ public class Analyzer {
 			report.incrementNbNo();
 	}
 
+	/**
+	 * Analyzes an AnswerBounded and updates the report corresponding to the question
+	 * 
+	 * @param answer the answer to analyze
+	 */
 	private void analyzeBounded(AnswerBounded answer) {
 		UUID id = answer.question_id;
-		Report report;
+		ReportBounded report;
 		if(this.list.containsKey(id)) {
-			report = this.list.get(id);
+			report = (ReportBounded) this.list.get(id);
 		}
 		else {
 			report = new ReportBounded();
@@ -225,6 +260,12 @@ public class Analyzer {
 		report.incrementNbAnswers();
 	}
 	
+	/**
+	 * Listener notified when an answer is written on the JavaSpace
+	 * 
+	 * @author Maxime
+	 *
+	 */
 	class EntryListener implements RemoteEventListener {
 		
 		private Analyzer analyzer;
