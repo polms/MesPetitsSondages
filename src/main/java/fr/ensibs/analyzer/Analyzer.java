@@ -269,10 +269,22 @@ public class Analyzer {
 	 */
 	class EntryListener implements RemoteEventListener {
 		
+		/**
+		 * The analyzer
+		 */
 		private Analyzer analyzer;
 		
+		/**
+		 * The template of the answer to listen
+		 */
 		private Answer answer;
 		
+		/**
+		 * Constructor
+		 * 
+		 * @param answer the template to listen
+		 * @param analyzer the analyzer
+		 */
 		public EntryListener(Answer answer, Analyzer analyzer) {
 			this.analyzer = analyzer;
 			this.answer = answer;

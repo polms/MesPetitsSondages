@@ -18,13 +18,18 @@ public class ReportBounded extends Report {
 	 */
 	private int average;
 	
+	/**
+	 * Adds an answer to the array
+	 * 
+	 * @param answer
+	 */
 	public void addAnswer(int answer) {
 		answers[answer]++;
 		average(answer);
 	}
 	
 	/**
-	 * Calcute the average
+	 * Calcutes the average
 	 * 
 	 * @param answer
 	 */
