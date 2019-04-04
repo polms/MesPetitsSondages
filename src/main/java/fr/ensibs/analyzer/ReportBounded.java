@@ -34,7 +34,7 @@ public class ReportBounded extends Report {
 	 * @param answer
 	 */
 	private void average(int answer) {
-		this.average = ((average * nbAnswers-1) + answer) / nbAnswers;
+		this.average = Math.round(((average * (this.nbAnswers-1)) + answer) / this.nbAnswers);
 	}
 	
 	/**
@@ -53,6 +53,18 @@ public class ReportBounded extends Report {
 	 */
 	public int getAverage() {
 		return this.average;
+	}
+	
+	@Override
+	public String toString() {
+		String s = "";
+		for(int i=1; i<=this.answers.length; i++) {
+			s += "\n" + i + " | " + this.answers[i-1];
+		}
+		return "\n ReportBounded :"
+				+ "\n - nombre total de réponses = " + this.nbAnswers
+				+ "\n - tableau = " + s
+				+ "\n - moyenne = " + this.average;
 	}
 
 }

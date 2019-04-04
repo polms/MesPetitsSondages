@@ -33,5 +33,16 @@ public class ReportFree extends Report {
 	public List<String> getAnswers() {
 		return this.list;
 	}
+	
+	@Override
+	public String toString() {
+		String s = "";
+		for(String z : this.list) {
+			s += "\n" + z;
+		}
+		return "\n ReportFree :"
+				+ "\n - nombre total de réponses = " + this.nbAnswers
+				+ "\n - liste des réponses = " + s;
+	}
 
 }
