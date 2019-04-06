@@ -1,6 +1,10 @@
 package fr.ensibs.analyzer;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.rmi.MarshalledObject;
 import java.rmi.RemoteException;
+import java.rmi.server.ExportException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -21,11 +25,17 @@ import fr.ensibs.sondages.questions.Answer;
 import fr.ensibs.sondages.questions.AnswerBounded;
 import fr.ensibs.sondages.questions.AnswerFree;
 import fr.ensibs.sondages.questions.AnswerYesNo;
+import net.jini.core.entry.Entry;
 import net.jini.core.entry.UnusableEntryException;
 import net.jini.core.event.RemoteEvent;
 import net.jini.core.event.RemoteEventListener;
 import net.jini.core.event.UnknownEventException;
+import net.jini.core.lease.Lease;
 import net.jini.core.transaction.TransactionException;
+import net.jini.export.Exporter;
+import net.jini.jeri.BasicILFactory;
+import net.jini.jeri.BasicJeriExporter;
+import net.jini.jeri.tcp.TcpServerEndpoint;
 import net.jini.space.JavaSpace;
 
 /**
@@ -116,25 +126,38 @@ public class Analyzer {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
+		Exporter myDefaultExporter =
+				new BasicJeriExporter(TcpServerEndpoint.getInstance(0),
+						new BasicILFactory(), false, true);
+
+		RemoteEventListener msgListener = null;
+		try {
+			msgListener = (RemoteEventListener) myDefaultExporter.export(new EntryListener());
+			System.out.println("Remote listener exported");
+		} catch (ExportException e) {
+			e.printStackTrace();
+		}
+
+
+
 		Answer tmpFree = new AnswerFree();
 		Answer tmpYesNo = new AnswerYesNo();
 		Answer tmpBounded = new AnswerBounded();
-		EntryListener listenerFree = new EntryListener(tmpFree, this);
-		EntryListener listenerYesNo = new EntryListener(tmpYesNo, this);
-		EntryListener listenerBounded = new EntryListener(tmpBounded, this);
 		try {
-			this.space.notify(tmpFree, null, listenerFree, Long.MAX_VALUE, null);
-			this.space.notify(tmpYesNo, null, listenerYesNo, Long.MAX_VALUE, null);
-			this.space.notify(tmpBounded, null, listenerBounded, Long.MAX_VALUE, null);
-		} catch (RemoteException | TransactionException e) {
+			this.space.notify(tmpFree, null, msgListener, Long.MAX_VALUE, new MarshalledObject<>(tmpFree));
+			this.space.notify(tmpYesNo, null, msgListener, Long.MAX_VALUE, new MarshalledObject<>(tmpYesNo));
+			this.space.notify(tmpBounded, null, msgListener, Long.MAX_VALUE, new MarshalledObject<>(tmpBounded));
+		} catch (TransactionException | IOException e) {
 			e.printStackTrace();
 		}
-		
+		System.out.println("Notifiers set");
+
 		createResponseQueue();
-		
+		System.out.println("Response queue set");
+
 		while(true) {
-			
+
 		}
 		
 	}
@@ -188,24 +211,20 @@ public class Analyzer {
 	/**
 	 * Read an answer from the JavaSpace
 	 * 
-	 * @param tmp the template of an answer
+	 * @param answer the template of an answer
 	 */
-	public void readAnswer(Answer tmp) {
-		Answer answer = null;
-		try {
-			answer = (Answer) this.space.readIfExists(tmp, null, Long.MAX_VALUE);
-		} catch (RemoteException | UnusableEntryException | TransactionException | InterruptedException e) {
-			e.printStackTrace();
-		}
+	public void readAnswer(Answer answer) {
 		if(answer != null) {
 			if(answer instanceof AnswerFree) {
-				analyzeFree((AnswerFree) answer);
+				analyze((AnswerFree) answer);
 			}
 			else if(answer instanceof AnswerYesNo) {
-				analyzeYesNo((AnswerYesNo) answer);
+				analyze((AnswerYesNo) answer);
 			}
 			else if(answer instanceof AnswerBounded) {
-				analyzeBounded((AnswerBounded) answer);
+				analyze((AnswerBounded) answer);
+			} else {
+				analyze(answer);
 			}
 		}	
 	}
@@ -215,7 +234,7 @@ public class Analyzer {
 	 * 
 	 * @param answer the answer to analyze
 	 */
-	private void analyzeFree(AnswerFree answer) {
+	private void analyze(AnswerFree answer) {
 		UUID id = answer.question_id;
 		ReportFree report;
 		if(this.list.containsKey(id)) {
@@ -234,7 +253,7 @@ public class Analyzer {
 	 * 
 	 * @param answer the answer to analyze
 	 */
-	private void analyzeYesNo(AnswerYesNo answer) {
+	private void analyze(AnswerYesNo answer) {
 		UUID id = answer.question_id;
 		ReportYesNo report;
 		if(this.list.containsKey(id)) {
@@ -252,11 +271,20 @@ public class Analyzer {
 	}
 
 	/**
+	 *	Called if you try to analyse an unhandled Answer type
+	 *
+	 * @param answer the answer to analyze
+	 */
+	private void analyze(Answer answer) {
+		System.out.println("Answer type not handled ("+answer.getClass()+") ");
+	}
+
+	/**
 	 * Analyzes an AnswerBounded and updates the report corresponding to the question
 	 * 
 	 * @param answer the answer to analyze
 	 */
-	private void analyzeBounded(AnswerBounded answer) {
+	private void analyze(AnswerBounded answer) {
 		UUID id = answer.question_id;
 		ReportBounded report;
 		if(this.list.containsKey(id)) {
@@ -276,34 +304,19 @@ public class Analyzer {
 	 * @author Maxime
 	 *
 	 */
-	class EntryListener implements RemoteEventListener {
-		
-		/**
-		 * The analyzer
-		 */
-		private Analyzer analyzer;
-		
-		/**
-		 * The template of the answer to listen
-		 */
-		private Answer answer;
-		
-		/**
-		 * Constructor
-		 * 
-		 * @param answer the template to listen
-		 * @param analyzer the analyzer
-		 */
-		public EntryListener(Answer answer, Analyzer analyzer) {
-			this.analyzer = analyzer;
-			this.answer = answer;
-		}
-
+	class EntryListener implements RemoteEventListener, Serializable {
 		@Override
-		public void notify(RemoteEvent event) throws UnknownEventException, RemoteException {
-			this.analyzer.readAnswer(answer);
-		}
+		public void notify(RemoteEvent event) {
+			try {
+				Answer answer_type = (Answer) event.getRegistrationObject().get();
+				Entry entry = Analyzer.this.space.read(answer_type, null, Long.MAX_VALUE);
+				Answer answer = (Answer) entry;
+				Analyzer.this.readAnswer(answer);
 
+			} catch (IOException | TransactionException | UnusableEntryException | InterruptedException | ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 }
