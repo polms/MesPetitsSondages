@@ -42,10 +42,11 @@ public class MainSounder {
 		String host = args[0];
 		int port = Integer.parseInt(args[1]);
 		
-		Analyzer instance = new Analyzer(host, port);
+		MainSounder instance = new MainSounder(host, port);
 	    try {
 			instance.run();
 		} catch (Exception e) {
+			System.out.println("can't run");
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
