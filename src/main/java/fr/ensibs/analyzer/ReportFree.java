@@ -2,6 +2,7 @@ package fr.ensibs.analyzer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Represents a report for a free question
@@ -10,11 +11,20 @@ import java.util.List;
  *
  */
 public class ReportFree extends Report {
-	
+
 	/**
 	 * The list of answers to the question
 	 */
 	private List<String> list = new ArrayList<>();
+	
+	/**
+	 * Constructor
+	 * 
+	 * @param id the question id
+	 */
+	public ReportFree(UUID id) {
+		super(id);
+	}
 	
 	/**
 	 * Adds an answer to the list
@@ -32,6 +42,17 @@ public class ReportFree extends Report {
 	 */
 	public List<String> getAnswers() {
 		return this.list;
+	}
+	
+	@Override
+	public String toString() {
+		String s = "";
+		for(String z : this.list) {
+			s += "\n" + z;
+		}
+		return "\n ReportFree :"
+				+ "\n - nombre total de réponses = " + this.nbAnswers
+				+ "\n - liste des réponses = " + s;
 	}
 
 }
