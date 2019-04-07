@@ -3,7 +3,6 @@ package fr.ensibs.analyzer;
 import java.io.IOException;
 import java.io.Serializable;
 import java.rmi.MarshalledObject;
-import java.rmi.RemoteException;
 import java.rmi.server.ExportException;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,8 +28,6 @@ import net.jini.core.entry.Entry;
 import net.jini.core.entry.UnusableEntryException;
 import net.jini.core.event.RemoteEvent;
 import net.jini.core.event.RemoteEventListener;
-import net.jini.core.event.UnknownEventException;
-import net.jini.core.lease.Lease;
 import net.jini.core.transaction.TransactionException;
 import net.jini.export.Exporter;
 import net.jini.jeri.BasicILFactory;
@@ -47,14 +44,24 @@ import net.jini.space.JavaSpace;
 public class Analyzer {
 	
 	/**
-	 * The host name of the server
+	 * The host name of the javaspace server
 	 */
-	private String hostName;
+	private String spaceHostName;
 	
 	/**
-	 * The port number to connect to the server
+	 * The port number to connect to the javaspace server
 	 */
-	private int portNumber;
+	private int spacePortNumber;
+	
+	/**
+	 * The host name of the jms server
+	 */
+	private String jmsHostName;
+	
+	/**
+	 * The port number to connect to the jms server
+	 */
+	private String jmsPortNumber;
 	
 	/**
 	 * The JavaSpace containing the data
@@ -76,11 +83,13 @@ public class Analyzer {
 	 */
 	private static void usage()
 	{
-		System.out.println("Usage: java -jar target/analyzer-1.0.jar <server_host> <server_port>");
+		System.out.println("Usage: java -jar target/analyzer-1.0.jar <js_server_host> <js_server_port> <jms_server_host> <jms_server_port>");
 		System.out.println("Launch the analyzer");
 		System.out.println("with:");
-		System.out.println("<server_host> the name of the server host");
-		System.out.println("<server_port> the number of the server port");
+		System.out.println("<js_server_host> the name of the javaspace server host");
+		System.out.println("<js_server_port> the number of the javaspace server port");
+		System.out.println("<jms_server_host> the name of the jms server host");
+		System.out.println("<jms_server_port> the number of the jms server port");
 		System.exit(0);
 	}
 
@@ -94,10 +103,12 @@ public class Analyzer {
 		if (args.length != 2 || args.equals("-h"))
 			usage();
 		
-		String host = args[0];
-		int port = Integer.parseInt(args[1]);
+		String spaceHost = args[0];
+		int spacePort = Integer.parseInt(args[1]);
+		String jmsHost = args[2];
+		String jmsPort = args[3];
 		
-		Analyzer instance = new Analyzer(host, port);
+		Analyzer instance = new Analyzer(spaceHost, spacePort, jmsHost, jmsPort);
 	    instance.run();
 	}
 	
@@ -107,9 +118,11 @@ public class Analyzer {
 	 * @param host the name of the server host
 	 * @param port the number of the server port
 	 */
-	public Analyzer(String host, int port) {
-		this.hostName = host;
-		this.portNumber = port;
+	public Analyzer(String spaceHost, int spacePort, String jmsHost, String jmsPort) {
+		this.spaceHostName = spaceHost;
+		this.spacePortNumber = spacePort;
+		this.jmsHostName = jmsHost;
+		this.jmsPortNumber = jmsPort;
 	}
 	
 	/**
@@ -122,7 +135,7 @@ public class Analyzer {
 		RiverLookup rl;
 		try {
 			rl = new RiverLookup();
-			this.space = rl.lookup(this.hostName, this.portNumber, JavaSpace.class);
+			this.space = rl.lookup(this.spaceHostName, this.spacePortNumber, JavaSpace.class);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -167,8 +180,8 @@ public class Analyzer {
 	 */
 	private void createResponseQueue() {
 		System.setProperty("java.naming.factory.initial", "fr.dyade.aaa.jndi2.client.NamingContextFactory");
-		System.setProperty("java.naming.factory.host", this.hostName);
-		System.setProperty("java.naming.factory.port", String.valueOf(this.portNumber));
+		System.setProperty("java.naming.factory.host", this.jmsHostName);
+		System.setProperty("java.naming.factory.port", this.jmsPortNumber);
 		
 		Session session = Connector.getInstance().createSession();
 		
