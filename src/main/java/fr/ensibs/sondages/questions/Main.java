@@ -28,31 +28,14 @@ public class Main {
     public void run() throws Exception {
         System.out.println("Enter commands:"
                 + "\n QUIT                                                      to quit the application"
-                + "\n ASK <question> <type>                                     to ask a new question"
                 + "\n LIST                                                      to query all available questions"
-                + "\n ANSWER <question_id>                                      to give an answer to the question"
-                + "\n ANALYSE LIST                                              to query all analyses"
-                + "\n ANALYSE GET <id>                                          to get the results of an analyse");
+                + "\n ANSWER <question_id>                                      to give an answer to the question");
 
         Scanner scanner = new Scanner(System.in);
         String line = scanner.nextLine();
         while (!line.toLowerCase().equals("quit")) {
             String[] command = line.split(" +");
             switch (command[0].toUpperCase()) {
-                case "ANALYSE":
-                    switch (command[1].toUpperCase()) {
-                        case "LIST":
-                        case "GET":
-                            System.out.println("nop");
-                            break;
-                        default:
-                            System.err.println("Unknown command: ADD \"" + command[1] + "\"");
-                    }
-                    break;
-                case "ASK": {
-                    this.poll.ask(command[1], Class.forName("fr.ensibs.sondages.questions."+command[2]));
-                }
-                    break;
                 case "LIST": {
                     ArrayList<Question> questions = this.poll.getQuestions();
                     if (questions.size() == 0)
