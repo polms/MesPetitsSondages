@@ -6,11 +6,11 @@ import net.jini.space.JavaSpace;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Main {
+public class MainAnswerer {
 
     public Poll poll;
 
-    public Main(Poll poll) {
+    public MainAnswerer(Poll poll) {
         this.poll = poll;
     }
 
@@ -25,7 +25,7 @@ public class Main {
     /**
      * Start the command line user interface
      */
-    public void run() throws Exception {
+    public void run() {
         System.out.println("Enter commands:"
                 + "\n QUIT                                                      to quit the application"
                 + "\n LIST                                                      to query all available questions"
@@ -86,7 +86,7 @@ public class Main {
 
 
         Poll poll = new Poll(javaSpace);
-        Main p = new Main(poll);
+        MainAnswerer p = new MainAnswerer(poll);
         p.run();
     }
 }

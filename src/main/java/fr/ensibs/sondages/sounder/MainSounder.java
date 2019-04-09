@@ -1,4 +1,4 @@
-package fr.ensibs.sondages.questions;
+package fr.ensibs.sondages.sounder;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -10,12 +10,9 @@ import javax.jms.MessageListener;
 import javax.jms.Queue;
 import javax.jms.Session;
 
-import fr.ensibs.analyzer.Analyzer;
-
 import fr.ensibs.joram.Connector;
 import fr.ensibs.joram.Helper;
-import fr.ensibs.river.RiverLookup;
-import net.jini.space.JavaSpace;
+import fr.ensibs.sondages.questions.*;
 
 public class MainSounder {
 	
@@ -42,10 +39,11 @@ public class MainSounder {
 		String host = args[0];
 		int port = Integer.parseInt(args[1]);
 		
-		Analyzer instance = new Analyzer(host, port);
+		MainSounder instance = new MainSounder(host, port);
 	    try {
 			instance.run();
 		} catch (Exception e) {
+			System.out.println("can't run");
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -65,7 +63,7 @@ public class MainSounder {
 		receiveQueue();
 		   System.out.println("Enter commands:"
 	                + "\n CREATE*<name>                                             to create a new questioner"
-	                + "\n CREATEQUESTION*<question>*<name>                          to ask a new question"
+	                + "\n CREATEQUESTION*<question>*<name>*<Free/YesNo/Bounded>          to ask a new question"
 	                + "\n LISTQUESTION*<name>                                       to obtain all the question of the user"
 	                + "\n GETANSWER*<name>                                          to obtain an answer"
 	                );
@@ -76,25 +74,77 @@ public class MainSounder {
 	            String[] command = line.split("\\*+");
 	            switch (command[0].toUpperCase()) {
 	                case "CREATE":{
-	                    this.createsounder.createSounder(command[1]);
-	                    System.out.println("Utilisateur crée");
+	                	
+	                	if(!this.createsounder.exist(command[1])){
+	                		this.createsounder.createSounder(command[1]);
+		                    System.out.println("Utilisateur crée");
+	                	}
+	                	else {System.out.println("Ce nom est déjà utilisé");}
+	                    
 	                    }
 	                    
 	                    break;
 	                case "CREATEQUESTION": {
 	                	
-	                    this.createsounder.addQuestion(this.createsounder.getId(command[2]),this.poll.ask(command[1], Class.forName("fr.ensibs.sondages.questions."+command[2])));
+                		if(this.createsounder.exist(command[2])) {
+                			
+                			switch(command[3].toUpperCase()){
+                			case"FREE":{
+                				Question q= this.poll.ask(command[1], AnswerFree.class);
+                				int id = this.createsounder.getId(command[2]);
+                    			this.createsounder.addQuestion(id, q);
+                				
+                			}
+                			break;
+                			case"BOUNDED":{
+                				Question q= this.poll.ask(command[1], AnswerBounded.class);
+                				int id = this.createsounder.getId(command[2]);
+                    			this.createsounder.addQuestion(id, q);
+                				
+                			}	
+                			break;
+                			case"YESNO":{
+                				Question q= this.poll.ask(command[1], AnswerYesNo.class);
+                				int id = this.createsounder.getId(command[2]);
+                    			this.createsounder.addQuestion(id, q);
+                				
+                			}
+                			break;
+                			default:
+        	                    System.err.println("Unknown type: "+command[4]);
+                			
+                    		
+                			
+                			}
+                		
+                		}
+                	
+	                		
+	                	
 	                }
 	                    break;
 	                case "LISTQUESTION": {
-	                    ArrayList<Question> question =this.createsounder.getSounder(this.createsounder.getId(command[1])).getQuestion();
-	                    System.out.println("questions:");
-	                    for(int i=0; i<question.size();i++) {
-	                    	System.out.println("- "+ question.get(i).getQuestion());
-	                    }
+	                	if (this.createsounder.exist(command[1])) {
+	                		 ArrayList<Question> question =this.createsounder.getSounder(this.createsounder.getId(command[1])).getQuestion();
+	 	                    System.out.println("questions:");
+							for (Question question1 : question) {
+								System.out.println("- " + question1.getQuestion());
+							}
+	                		
+	                	}
+	                   
 	                }
 	                    break;
 	                case "GETANSWER": {
+	                	if(this.createsounder.exist(command[1])){
+	                		
+	                	}
+	                	
+	                	
+	                	
+	                	
+	                	
+	                	
 	                	Sounder s =  this.createsounder.getSounder(this.createsounder.getId(command[1]));
 	                	ArrayList<Question> question =s.getQuestion();
 	                	for(int i=0; i<question.size();) {
@@ -103,9 +153,9 @@ public class MainSounder {
 	                		}
 	                	}
 	                	System.out.println("Cette question n'existe pas pour cet utilisateur");
-	                	for(int i=0; i<question.size();i++) {
-	                    	System.out.println("- "+ question.get(i).getQuestion());
-	                    }
+						for (Question question1 : question) {
+							System.out.println("- " + question1.getQuestion());
+						}
 	                    
 	                }
 	                    break;
@@ -115,7 +165,7 @@ public class MainSounder {
 	            }
 	            line = scanner.nextLine();
 	        }
-
+	        this.createsounder.Save();
 	        System.out.println("Exit");
 	        System.exit(0);
 			
@@ -133,12 +183,7 @@ public class MainSounder {
 		Session sessionListener = Connector.getInstance().createSession();
 		try {
 			MessageConsumer consumer = sessionListener.createConsumer(this.maqueue);
-			consumer.setMessageListener(new MessageListener() {
-				@Override
-				public void onMessage(Message message) {
-					System.out.println(message.toString());
-				}
-		    });  
+			consumer.setMessageListener(message -> System.out.println(message.toString()));
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}

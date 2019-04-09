@@ -1,7 +1,8 @@
-package fr.ensibs.sondages.questions;
+package fr.ensibs.sondages.sounder;
 
 import java.util.ArrayList;
 
+import fr.ensibs.sondages.questions.Question;
 import net.jini.core.entry.Entry;
 
 public class Sounder implements Entry {
@@ -12,7 +13,7 @@ public class Sounder implements Entry {
 	public Sounder(int id, String name){
 		this.id=id;
 		this.name=name;
-		this.questions = new ArrayList<Question>();
+		this.questions = new ArrayList<>();
 	}
 	public String toString() {
 		
