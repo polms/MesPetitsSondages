@@ -15,7 +15,7 @@ public class Launcher {
      * Print usage info and exit the program with code -1
      */
     public static void usage() {
-        System.out.println("Usage: (sounder|answerer|analyser) [args]");
+        System.out.println("Usage: (sounder|answerer|analyzer) [args]");
         System.exit(-1);
     }
 
@@ -31,7 +31,7 @@ public class Launcher {
             case "answerer":
                 MainAnswerer.main(Arrays.copyOfRange(args, 1, args.length));
                 break;
-            case "analyser":
+            case "analyzer":
                 Analyzer.main(Arrays.copyOfRange(args, 1, args.length));
                 break;
             default:

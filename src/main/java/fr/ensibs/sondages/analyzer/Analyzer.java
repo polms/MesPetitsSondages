@@ -83,7 +83,7 @@ public class Analyzer {
 	 */
 	private static void usage()
 	{
-		System.out.println("Usage: java -jar target/analyzer-1.0.jar <js_server_host> <js_server_port> <jms_server_host> <jms_server_port>");
+		System.out.println("Usage: analyzer <js_server_host> <js_server_port> <jms_server_host> <jms_server_port>");
 		System.out.println("Launch the analyzer");
 		System.out.println("with:");
 		System.out.println("<js_server_host> the name of the javaspace server host");
