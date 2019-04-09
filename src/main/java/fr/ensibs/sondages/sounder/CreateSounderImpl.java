@@ -28,33 +28,38 @@ public class CreateSounderImpl implements CreateSounder {
 
 	private ArrayList<Sounder> sounders;
 	private Session session;
-	private Session session_listener;
-	private MessageConsumer consumer;
 	private Connector connector;
 	private Queue queue;
 	
 	
 	//------------Constructeur vide-------
-	public CreateSounderImpl(String host, int port) {
-
+	public CreateSounderImpl(String host, String port) {
+		
+		
 		this.connector=Connector.getInstance();
 		this.session = connector.createSession();
 		this.sounders = new ArrayList<>();
-		this.queue = Helper.getQueue(session, "request2");
+		this.queue = Helper.getQueue(session, "request");
 		
-		session_listener = connector.createSession();
+		Session sessionListener = this.connector.createSession();
 		try {
-			consumer = session_listener.createConsumer(this.queue);
-			consumer.setMessageListener(message -> {
-				try {
-					message.acknowledge();
-					Report r=message.getBody(Report.class);
-					System.out.println(r.toString());
-				} catch (JMSException e) {
-					e.printStackTrace();
+			MessageConsumer consumer = sessionListener.createConsumer(this.queue);
+			consumer.setMessageListener(new MessageListener() {
+				@Override
+				public void onMessage(Message message) {
+					ObjectMessage m = (ObjectMessage) message;
+					
+					try {
+						Report r=(Report)m.getObject();
+						System.out.println(r.toString());
+						
+					} catch (JMSException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
 				}
-
-			});
+		    });  
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}
@@ -141,7 +146,7 @@ public class CreateSounderImpl implements CreateSounder {
 	public void askAnswer(int id, UUID question) {
 		
 		try {
-			MessageProducer producer = this.session.createProducer(Helper.getQueue(session, "response2"));
+			MessageProducer producer = this.session.createProducer(Helper.getQueue(session, "response"));
 			Sounder sound = getSounder(id);
 			if(sound!= null) {
 				ArrayList<Question> q = sound.getQuestion();

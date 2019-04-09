@@ -17,30 +17,27 @@ import fr.ensibs.sondages.questions.*;
 
 public class MainSounder {
 	
-	private int port;
-	private String host;
+	private static String port;
+	private static String host;
 	private CreateSounderImpl createsounder;
 	private Poll poll;
 	
 	private static void usage()
 	{
-		System.out.println("Usage: java -jar target/MainSounder-1.0.jar <server_host> <server_port>");
-		System.out.println("Launch the sounder");
-		System.out.println("with:");
-		System.out.println("<server_host> the name of the server host");
-		System.out.println("<server_port> the number of the server port");
+		System.out.println("Usage:sounder <jms_host> <jms_port>");
+
 		System.exit(0);
 	}
 	public static void main(String[] args) {
+		
 		if (args.length != 2 || args.equals("-h"))
 			usage();
 		
-		String host = args[0];
-		int port = Integer.parseInt(args[1]);
+		host = args[0];
+		port = args[1];
 		System.setProperty("java.naming.factory.initial", "fr.dyade.aaa.jndi2.client.NamingContextFactory");
 		System.setProperty("java.naming.factory.host", host);
-		System.setProperty("java.naming.factory.port", String.valueOf(port));
-
+		System.setProperty("java.naming.factory.port", port);
 		MainSounder instance = new MainSounder(host, port);
 	    try {
 			instance.run();
@@ -52,7 +49,7 @@ public class MainSounder {
 	}
 	
 	
-	public MainSounder(String host, int port) {
+	public MainSounder(String host, String port) {
 		this.host = host;
 		this.port = port;
 		this.createsounder=new CreateSounderImpl(this.host, this.port);
@@ -65,7 +62,7 @@ public class MainSounder {
 		
 		   System.out.println("Enter commands:"
 	                + "\n CREATE*<name>                                             to create a new questioner"
-	                + "\n CREATEQUESTION*<question>*<name>*<Free/YesNo/Bounded>     to ask a new question"
+	                + "\n CREATEQUESTION*<question>*<name>*<Free/YesNo/Bounded>          to ask a new question"
 	                + "\n LISTQUESTION*<name>                                       to obtain all the question of the user"
 	                + "\n GETANSWER*<name>*<numquestion>                            to obtain an answer"
 	                );

@@ -7,14 +7,14 @@ import java.util.UUID;
 public interface CreateSounder {
 	
 	/**
-	 * methode used to create sounders
+	 * method used to create sounder
 	 * @param name name of the sounder
 	 */
 	void createSounder(String name);
 	
 	/**
 	 * method used to link a sounder with a question
-	 * @param idsounder th id of the sounder
+	 * @param idsounder the id of the sounder
 	 * @param q the question
 	 */
 	void addQuestion(int idsounder, Question q);
@@ -29,7 +29,7 @@ public interface CreateSounder {
 	void Load();
 
 	/**
-	 * method used ti adk the answer of the question
+	 * method used to ask the answer of the question
 	 */
 	void askAnswer(int id, UUID question);
 }
