@@ -11,7 +11,6 @@ import java.util.UUID;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
-import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
 import javax.jms.Queue;
@@ -74,7 +73,7 @@ public class Analyzer {
 	private Queue queue;
 	
 	/**
-	 * The Map associating an question id with a report
+	 * The Map associating a question id with a report
 	 */
 	private Map<UUID, Report> list = new HashMap<>();
 		
@@ -129,7 +128,6 @@ public class Analyzer {
 	 * 
 	 * @throws Exception 
 	 */
-	@SuppressWarnings("JavaDoc")
 	public void run() {
 		
 		RiverLookup rl;
@@ -177,7 +175,7 @@ public class Analyzer {
 		
 		Session session = Connector.getInstance().createSession();
 		
-		this.queue = Helper.getQueue(session, "response2");
+		this.queue = Helper.getQueue(session, "response");
 		
 		Session sessionListener = Connector.getInstance().createSession();
 		try {

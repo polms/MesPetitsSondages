@@ -37,6 +37,11 @@ public abstract class Report implements Serializable {
 		nbAnswers++;
 	}
 	
+	/**
+	 * Gets the question id
+	 * 
+	 * @return the question id
+	 */
 	public UUID getId() {
 		return this.id;
 	}
