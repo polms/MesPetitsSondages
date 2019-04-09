@@ -1,7 +1,8 @@
-package fr.ensibs.sondages.questions;
+package fr.ensibs.sondages.sounder;
 
 import java.util.ArrayList;
 
+import fr.ensibs.sondages.questions.Question;
 import net.jini.core.entry.Entry;
 
 public class Sounder implements Entry {

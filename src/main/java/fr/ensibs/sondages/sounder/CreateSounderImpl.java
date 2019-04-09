@@ -1,14 +1,11 @@
-package fr.ensibs.sondages.questions;
+package fr.ensibs.sondages.sounder;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -20,7 +17,7 @@ import javax.jms.Session;
 
 import fr.ensibs.joram.Connector;
 import fr.ensibs.joram.Helper;
-import net.jini.space.JavaSpace;
+import fr.ensibs.sondages.questions.Question;
 
 public class CreateSounderImpl implements CreateSounder {
 

@@ -6,7 +6,7 @@
 
     <groupId>fr.ensibs</groupId>
     <artifactId>sondages</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -61,15 +61,17 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.1.1</version>
                 <configuration>
+                    <classifier>Core</classifier>
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>fr.ensibs.photosharing.PhotoSharingApp</mainClass>
+                            <mainClass>fr.ensibs.sondages.Laucher</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
 </project>

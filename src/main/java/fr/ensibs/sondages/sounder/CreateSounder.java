@@ -1,4 +1,6 @@
-package fr.ensibs.sondages.questions;
+package fr.ensibs.sondages.sounder;
+
+import fr.ensibs.sondages.questions.Question;
 
 import java.util.UUID;
 
@@ -15,7 +17,7 @@ public interface CreateSounder {
 	 * @param idsounder th id of the sounder
 	 * @param q the question
 	 */
-	public void addQuestion(int idsounder,Question q);
+	public void addQuestion(int idsounder, Question q);
 	/**
 	 * method used to print informations in file
 	 */

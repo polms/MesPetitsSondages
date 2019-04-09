@@ -1,4 +1,4 @@
-package fr.ensibs.sondages.questions;
+package fr.ensibs.sondages.sounder;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -10,12 +10,11 @@ import javax.jms.MessageListener;
 import javax.jms.Queue;
 import javax.jms.Session;
 
-import fr.ensibs.analyzer.Analyzer;
+import fr.ensibs.sondages.analyzer.Analyzer;
 
 import fr.ensibs.joram.Connector;
 import fr.ensibs.joram.Helper;
-import fr.ensibs.river.RiverLookup;
-import net.jini.space.JavaSpace;
+import fr.ensibs.sondages.questions.*;
 
 public class MainSounder {
 	
@@ -139,7 +138,7 @@ public class MainSounder {
 	                }
 	                    break;
 	                case "GETANSWER": {
-	                	if(this.createsounder.exist(command[1]))){
+	                	if(this.createsounder.exist(command[1])){
 	                		
 	                	}
 	                	
