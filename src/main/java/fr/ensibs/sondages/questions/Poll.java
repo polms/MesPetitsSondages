@@ -9,7 +9,6 @@ import net.jini.space.JavaSpace;
 import javax.jms.*;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.UUID;
 
 
 /**
@@ -50,16 +49,6 @@ public class Poll {
                     e.printStackTrace();
                 }
             });
-
-            Answer ta = new AnswerYesNo(UUID.randomUUID());
-            ((AnswerYesNo) ta).response = true;
-            try {
-                this.javaSpace.write(ta, null, Lease.FOREVER);
-            } catch (TransactionException e) {
-                e.printStackTrace();
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
         } catch (JMSException e) {
             e.printStackTrace();
         }

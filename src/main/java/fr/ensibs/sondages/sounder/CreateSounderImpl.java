@@ -36,9 +36,8 @@ public class CreateSounderImpl implements CreateSounder {
 		
 		this.connector=Connector.getInstance();
 		this.session = connector.createSession();
-		this.sounders = new ArrayList<Sounder>();
-		Helper help = new Helper();
-		this.queue = help.getQueue(session, "request");
+		this.sounders = new ArrayList<>();
+		this.queue = Helper.getQueue(session, "request");
 		
 	}
 	
@@ -51,12 +50,12 @@ public class CreateSounderImpl implements CreateSounder {
 
 	@Override
 	public void addQuestion(int idsounder, Question q) {
-		for (int i=0; i<sounders.size();i++) {
+		for (Sounder sounder : sounders) {
 			// on trouve le sondeur
-			if (sounders.get(i).getId()==idsounder) {
-				this.sounders.get(i).addQuestion(q);
-				
-				
+			if (sounder.getId() == idsounder) {
+				sounder.addQuestion(q);
+
+
 			}
 		}
 
@@ -70,8 +69,8 @@ public class CreateSounderImpl implements CreateSounder {
 			try {
 				File f = new File("sounders.ser");
 				ObjectOutputStream oos= new ObjectOutputStream(new FileOutputStream(f));
-				for(int i=0; i<sounders.size();i++) {
-					oos.writeObject(this.sounders.get(i));
+				for (Sounder sounder : sounders) {
+					oos.writeObject(sounder);
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -102,18 +101,18 @@ public class CreateSounderImpl implements CreateSounder {
 	}
 
 	public Sounder getSounder(int id) {
-		for (int i=0; i<sounders.size(); i++) {
-			if(this.sounders.get(i).getId()==id) {
-				return this.sounders.get(i);
+		for (Sounder sounder : sounders) {
+			if (sounder.getId() == id) {
+				return sounder;
 			}
 		}
 		return null;
 	}
 	public Integer getId(String name) {
-		for (int i=0; i<sounders.size(); i++) {
-			if(this.sounders.get(i).getName().equals(name)) {
-				return this.sounders.get(i).getId();
-				
+		for (Sounder sounder : sounders) {
+			if (sounder.getName().equals(name)) {
+				return sounder.getId();
+
 			}
 		}
 		return null;
@@ -127,8 +126,8 @@ public class CreateSounderImpl implements CreateSounder {
 			if(sound!= null) {
 				ArrayList<Question> q = sound.getQuestion();
 				// compteur de questions
-				for(int j=0; j<q.size();j++) {
-					if (q.get(j).getID().equals(question)) {
+				for (Question question1 : q) {
+					if (question1.getID().equals(question)) {
 						ObjectMessage message = this.session.createObjectMessage(question);
 						message.setJMSReplyTo(this.queue);
 						producer.send(message);
@@ -143,11 +142,11 @@ public class CreateSounderImpl implements CreateSounder {
 		
 	}
 	public boolean exist(String name) {
-		for (int i=0; i<sounders.size(); i++) {
-			if(sounders.get(i).getName().equals(name)) {
+		for (Sounder sounder : sounders) {
+			if (sounder.getName().equals(name)) {
 				return true;
 			}
-			
+
 		}
 		return false;
 	}

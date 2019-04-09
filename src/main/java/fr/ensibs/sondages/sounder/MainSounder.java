@@ -10,8 +10,6 @@ import javax.jms.MessageListener;
 import javax.jms.Queue;
 import javax.jms.Session;
 
-import fr.ensibs.sondages.analyzer.Analyzer;
-
 import fr.ensibs.joram.Connector;
 import fr.ensibs.joram.Helper;
 import fr.ensibs.sondages.questions.*;
@@ -129,9 +127,9 @@ public class MainSounder {
 	                	if (this.createsounder.exist(command[1])) {
 	                		 ArrayList<Question> question =this.createsounder.getSounder(this.createsounder.getId(command[1])).getQuestion();
 	 	                    System.out.println("questions:");
-	 	                    for(int i=0; i<question.size();i++) {
-	 	                    	System.out.println("- "+ question.get(i).getQuestion());
-	 	                    }
+							for (Question question1 : question) {
+								System.out.println("- " + question1.getQuestion());
+							}
 	                		
 	                	}
 	                   
@@ -155,9 +153,9 @@ public class MainSounder {
 	                		}
 	                	}
 	                	System.out.println("Cette question n'existe pas pour cet utilisateur");
-	                	for(int i=0; i<question.size();i++) {
-	                    	System.out.println("- "+ question.get(i).getQuestion());
-	                    }
+						for (Question question1 : question) {
+							System.out.println("- " + question1.getQuestion());
+						}
 	                    
 	                }
 	                    break;
@@ -185,12 +183,7 @@ public class MainSounder {
 		Session sessionListener = Connector.getInstance().createSession();
 		try {
 			MessageConsumer consumer = sessionListener.createConsumer(this.maqueue);
-			consumer.setMessageListener(new MessageListener() {
-				@Override
-				public void onMessage(Message message) {
-					System.out.println(message.toString());
-				}
-		    });  
+			consumer.setMessageListener(message -> System.out.println(message.toString()));
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}

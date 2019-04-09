@@ -68,9 +68,9 @@ public class ReportBounded extends Report {
 	
 	@Override
 	public String toString() {
-		String s = "";
+		StringBuilder s = new StringBuilder();
 		for(int i=1; i<=this.answers.length; i++) {
-			s += "\n" + i + " | " + this.answers[i-1];
+			s.append("\n").append(i).append(" | ").append(this.answers[i - 1]);
 		}
 		return "\n ReportBounded :"
 				+ "\n - nombre total de réponses = " + this.nbAnswers

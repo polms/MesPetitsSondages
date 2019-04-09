@@ -97,10 +97,9 @@ public class Analyzer {
 	 * Application entry point
 	 * 
 	 * @param args see usage
-	 * @throws Exception 
 	 */
-	public static void main(String[] args) throws Exception {
-		if (args.length != 4 || args.equals("-h"))
+	public static void main(String[] args) {
+		if (args.length != 4 || args[0].equals("-h"))
 			usage();
 		
 		String spaceHost = args[0];
@@ -130,6 +129,7 @@ public class Analyzer {
 	 * 
 	 * @throws Exception 
 	 */
+	@SuppressWarnings("JavaDoc")
 	public void run() {
 		
 		RiverLookup rl;
@@ -168,11 +168,6 @@ public class Analyzer {
 
 		createResponseQueue();
 		System.out.println("Response queue set");
-
-		while(true) {
-
-		}
-		
 	}
 	
 	/**
@@ -190,16 +185,13 @@ public class Analyzer {
 		Session sessionListener = Connector.getInstance().createSession();
 		try {
 			MessageConsumer consumer = sessionListener.createConsumer(this.queue);
-			consumer.setMessageListener(new MessageListener() {
-				@Override
-				public void onMessage(Message message) {
-					try {
-						reply(session, message);
-					} catch (JMSException e) {
-						e.printStackTrace();
-					}
+			consumer.setMessageListener(message -> {
+				try {
+					reply(session, message);
+				} catch (JMSException e) {
+					e.printStackTrace();
 				}
-		    });  
+			});
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}
@@ -212,6 +204,7 @@ public class Analyzer {
 	 * @param msg the received message
 	 * @throws JMSException
 	 */
+	@SuppressWarnings("JavaDoc")
 	private void reply(Session session, Message msg) throws JMSException {
 		ObjectMessage message = (ObjectMessage) msg;
 		UUID uuid = (UUID) message.getObject();

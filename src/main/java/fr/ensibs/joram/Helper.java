@@ -21,7 +21,7 @@ public class Helper {
         Topic t = null;
         try {
             t = (Topic) context.lookup(topic);
-        } catch (NamingException e) {}
+        } catch (NamingException ignored) {}
 
         try {
             if (t == null) {
@@ -44,7 +44,7 @@ public class Helper {
         Queue q = null;
         try {
             q = (Queue) context.lookup(queue);
-        } catch (NamingException e) {}
+        } catch (NamingException ignored) {}
 
         try {
             if (q == null) {

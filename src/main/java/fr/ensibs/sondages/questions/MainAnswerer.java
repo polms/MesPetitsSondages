@@ -25,7 +25,7 @@ public class MainAnswerer {
     /**
      * Start the command line user interface
      */
-    public void run() throws Exception {
+    public void run() {
         System.out.println("Enter commands:"
                 + "\n QUIT                                                      to quit the application"
                 + "\n LIST                                                      to query all available questions"

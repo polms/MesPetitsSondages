@@ -46,9 +46,9 @@ public class ReportFree extends Report {
 	
 	@Override
 	public String toString() {
-		String s = "";
+		StringBuilder s = new StringBuilder();
 		for(String z : this.list) {
-			s += "\n" + z;
+			s.append("\n").append(z);
 		}
 		return "\n ReportFree :"
 				+ "\n - nombre total de réponses = " + this.nbAnswers
