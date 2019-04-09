@@ -145,6 +145,15 @@ public class CreateSounderImpl implements CreateSounder {
 		}
 		
 	}
+	public boolean exist(String name) {
+		for (int i=0; i<sounders.size(); i++) {
+			if(sounders.get(i).getName().equals(name)) {
+				return true;
+			}
+			
+		}
+		return false;
+	}
 	
 
 }

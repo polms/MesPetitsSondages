@@ -66,7 +66,7 @@ public class MainSounder {
 		receiveQueue();
 		   System.out.println("Enter commands:"
 	                + "\n CREATE*<name>                                             to create a new questioner"
-	                + "\n CREATEQUESTION*<question>*<name>                          to ask a new question"
+	                + "\n CREATEQUESTION*<question>*<name>*<Free/YesNo/Bounded>          to ask a new question"
 	                + "\n LISTQUESTION*<name>                                       to obtain all the question of the user"
 	                + "\n GETANSWER*<name>                                          to obtain an answer"
 	                );
@@ -77,25 +77,77 @@ public class MainSounder {
 	            String[] command = line.split("\\*+");
 	            switch (command[0].toUpperCase()) {
 	                case "CREATE":{
-	                    this.createsounder.createSounder(command[1]);
-	                    System.out.println("Utilisateur crée");
+	                	
+	                	if(!this.createsounder.exist(command[1])){
+	                		this.createsounder.createSounder(command[1]);
+		                    System.out.println("Utilisateur crée");
+	                	}
+	                	else {System.out.println("Ce nom est déjà utilisé");}
+	                    
 	                    }
 	                    
 	                    break;
 	                case "CREATEQUESTION": {
 	                	
-	                    this.createsounder.addQuestion(this.createsounder.getId(command[2]),this.poll.ask(command[1], Class.forName("fr.ensibs.sondages.questions."+command[2])));
+                		if(this.createsounder.exist(command[2])) {
+                			
+                			switch(command[3].toUpperCase()){
+                			case"FREE":{
+                				Question q= this.poll.ask(command[1], AnswerFree.class);
+                				int id = this.createsounder.getId(command[2]);
+                    			this.createsounder.addQuestion(id, q);
+                				
+                			}
+                			break;
+                			case"BOUNDED":{
+                				Question q= this.poll.ask(command[1], AnswerBounded.class);
+                				int id = this.createsounder.getId(command[2]);
+                    			this.createsounder.addQuestion(id, q);
+                				
+                			}	
+                			break;
+                			case"YESNO":{
+                				Question q= this.poll.ask(command[1], AnswerYesNo.class);
+                				int id = this.createsounder.getId(command[2]);
+                    			this.createsounder.addQuestion(id, q);
+                				
+                			}
+                			break;
+                			default:
+        	                    System.err.println("Unknown type: "+command[4]);
+                			
+                    		
+                			
+                			}
+                		
+                		}
+                	
+	                		
+	                	
 	                }
 	                    break;
 	                case "LISTQUESTION": {
-	                    ArrayList<Question> question =this.createsounder.getSounder(this.createsounder.getId(command[1])).getQuestion();
-	                    System.out.println("questions:");
-	                    for(int i=0; i<question.size();i++) {
-	                    	System.out.println("- "+ question.get(i).getQuestion());
-	                    }
+	                	if (this.createsounder.exist(command[1])) {
+	                		 ArrayList<Question> question =this.createsounder.getSounder(this.createsounder.getId(command[1])).getQuestion();
+	 	                    System.out.println("questions:");
+	 	                    for(int i=0; i<question.size();i++) {
+	 	                    	System.out.println("- "+ question.get(i).getQuestion());
+	 	                    }
+	                		
+	                	}
+	                   
 	                }
 	                    break;
 	                case "GETANSWER": {
+	                	if(this.createsounder.exist(command[1]))){
+	                		
+	                	}
+	                	
+	                	
+	                	
+	                	
+	                	
+	                	
 	                	Sounder s =  this.createsounder.getSounder(this.createsounder.getId(command[1]));
 	                	ArrayList<Question> question =s.getQuestion();
 	                	for(int i=0; i<question.size();) {
@@ -116,7 +168,7 @@ public class MainSounder {
 	            }
 	            line = scanner.nextLine();
 	        }
-
+	        this.createsounder.Save();
 	        System.out.println("Exit");
 	        System.exit(0);
 			

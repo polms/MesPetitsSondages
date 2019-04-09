@@ -100,7 +100,7 @@ public class Analyzer {
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
-		if (args.length != 2 || args.equals("-h"))
+		if (args.length != 4 || args.equals("-h"))
 			usage();
 		
 		String spaceHost = args[0];
