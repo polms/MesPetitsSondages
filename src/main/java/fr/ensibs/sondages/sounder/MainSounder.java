@@ -37,7 +37,10 @@ public class MainSounder {
 		
 		String host = args[0];
 		int port = Integer.parseInt(args[1]);
-		
+		System.setProperty("java.naming.factory.initial", "fr.dyade.aaa.jndi2.client.NamingContextFactory");
+		System.setProperty("java.naming.factory.host", host);
+		System.setProperty("java.naming.factory.port", String.valueOf(port));
+
 		MainSounder instance = new MainSounder(host, port);
 	    try {
 			instance.run();
@@ -62,7 +65,7 @@ public class MainSounder {
 		
 		   System.out.println("Enter commands:"
 	                + "\n CREATE*<name>                                             to create a new questioner"
-	                + "\n CREATEQUESTION*<question>*<name>*<Free/YesNo/Bounded>          to ask a new question"
+	                + "\n CREATEQUESTION*<question>*<name>*<Free/YesNo/Bounded>     to ask a new question"
 	                + "\n LISTQUESTION*<name>                                       to obtain all the question of the user"
 	                + "\n GETANSWER*<name>*<numquestion>                            to obtain an answer"
 	                );

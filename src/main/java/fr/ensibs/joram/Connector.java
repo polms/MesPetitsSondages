@@ -45,7 +45,7 @@ public class Connector {
      */
     public Session createSession() {
         try {
-            return this.connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            return this.connection.createSession(false, Session.CLIENT_ACKNOWLEDGE);
         } catch (JMSException e) {
             e.printStackTrace();
         }

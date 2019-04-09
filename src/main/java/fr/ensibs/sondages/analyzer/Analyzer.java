@@ -177,13 +177,14 @@ public class Analyzer {
 		
 		Session session = Connector.getInstance().createSession();
 		
-		this.queue = Helper.getQueue(session, "response");
+		this.queue = Helper.getQueue(session, "response2");
 		
 		Session sessionListener = Connector.getInstance().createSession();
 		try {
 			MessageConsumer consumer = sessionListener.createConsumer(this.queue);
 			consumer.setMessageListener(message -> {
 				try {
+					message.acknowledge();
 					System.out.println("Request received");
 					reply(session, message);
 					System.out.println("Response sent");
@@ -315,7 +316,7 @@ public class Analyzer {
 			try {
 				System.out.println("Answer received");
 				Answer answer_type = (Answer) event.getRegistrationObject().get();
-				Entry entry = Analyzer.this.space.read(answer_type, null, Long.MAX_VALUE);
+				Entry entry = Analyzer.this.space.take(answer_type, null, Long.MAX_VALUE);
 				Answer answer = (Answer) entry;
 				Analyzer.this.readAnswer(answer);
 			} catch (IOException | TransactionException | UnusableEntryException | InterruptedException | ClassNotFoundException e) {

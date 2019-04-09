@@ -28,40 +28,33 @@ public class CreateSounderImpl implements CreateSounder {
 
 	private ArrayList<Sounder> sounders;
 	private Session session;
+	private Session session_listener;
+	private MessageConsumer consumer;
 	private Connector connector;
 	private Queue queue;
 	
 	
 	//------------Constructeur vide-------
 	public CreateSounderImpl(String host, int port) {
-		System.setProperty("java.naming.factory.initial", "fr.dyade.aaa.jndi2.client.NamingContextFactory");
-		System.setProperty("java.naming.factory.host", host);
-		System.setProperty("java.naming.factory.port", String.valueOf(port));
-		
+
 		this.connector=Connector.getInstance();
 		this.session = connector.createSession();
 		this.sounders = new ArrayList<>();
-		this.queue = Helper.getQueue(session, "request");
+		this.queue = Helper.getQueue(session, "request2");
 		
-		Session sessionListener = Connector.getInstance().createSession();
+		session_listener = connector.createSession();
 		try {
-			MessageConsumer consumer = sessionListener.createConsumer(this.queue);
-			consumer.setMessageListener(new MessageListener() {
-				@Override
-				public void onMessage(Message message) {
-					ObjectMessage m = (ObjectMessage) message;
-					
-					try {
-						Report r=(Report)m.getObject();
-						System.out.println(r.toString());
-						
-					} catch (JMSException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					
+			consumer = session_listener.createConsumer(this.queue);
+			consumer.setMessageListener(message -> {
+				try {
+					message.acknowledge();
+					Report r=message.getBody(Report.class);
+					System.out.println(r.toString());
+				} catch (JMSException e) {
+					e.printStackTrace();
 				}
-		    });  
+
+			});
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}
@@ -148,7 +141,7 @@ public class CreateSounderImpl implements CreateSounder {
 	public void askAnswer(int id, UUID question) {
 		
 		try {
-			MessageProducer producer = this.session.createProducer(Helper.getQueue(session, "response"));
+			MessageProducer producer = this.session.createProducer(Helper.getQueue(session, "response2"));
 			Sounder sound = getSounder(id);
 			if(sound!= null) {
 				ArrayList<Question> q = sound.getQuestion();
