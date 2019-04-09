@@ -9,7 +9,7 @@ import java.util.Arrays;
 /**
  * Main laucher for the apps
  */
-public class Laucher {
+public class Launcher {
 
     /**
      * Print usage info and exit the program with code -1
