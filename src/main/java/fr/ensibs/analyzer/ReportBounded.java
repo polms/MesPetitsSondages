@@ -73,6 +73,7 @@ public class ReportBounded extends Report {
 			s += "\n" + i + " | " + this.answers[i-1];
 		}
 		return "\n ReportBounded :"
+				+ "\n - id question = " + this.id
 				+ "\n - nombre total de réponses = " + this.nbAnswers
 				+ "\n - tableau = " + s
 				+ "\n - moyenne = " + this.average;

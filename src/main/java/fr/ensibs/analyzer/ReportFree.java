@@ -51,6 +51,7 @@ public class ReportFree extends Report {
 			s += "\n" + z;
 		}
 		return "\n ReportFree :"
+				+ "\n - id question = " + this.id
 				+ "\n - nombre total de réponses = " + this.nbAnswers
 				+ "\n - liste des réponses = " + s;
 	}

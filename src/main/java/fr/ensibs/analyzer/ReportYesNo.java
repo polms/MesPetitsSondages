@@ -64,6 +64,7 @@ public class ReportYesNo extends Report {
 	@Override
 	public String toString() {
 		return "\n ReportFree :"
+				+ "\n - id question = " + this.id
 				+ "\n - nombre total de réponses = " + this.nbAnswers
 				+ "\n - nombre de réponses positives = " + this.nbYes
 				+ "\n - nombre de réponses négatives = " + this.nbNo;
