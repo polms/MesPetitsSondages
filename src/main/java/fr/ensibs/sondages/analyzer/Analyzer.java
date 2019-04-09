@@ -136,13 +136,12 @@ public class Analyzer {
 		try {
 			rl = new RiverLookup();
 			this.space = rl.lookup(this.spaceHostName, this.spacePortNumber, JavaSpace.class);
+			System.out.println("JavaSpace found");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		Exporter myDefaultExporter =
-				new BasicJeriExporter(TcpServerEndpoint.getInstance(0),
-						new BasicILFactory(), false, true);
+		Exporter myDefaultExporter = new BasicJeriExporter(TcpServerEndpoint.getInstance(0), new BasicILFactory(), false, true);
 
 		RemoteEventListener msgListener = null;
 		try {
@@ -151,8 +150,6 @@ public class Analyzer {
 		} catch (ExportException e) {
 			e.printStackTrace();
 		}
-
-
 
 		Answer tmpFree = new AnswerFree();
 		Answer tmpYesNo = new AnswerYesNo();
@@ -187,7 +184,9 @@ public class Analyzer {
 			MessageConsumer consumer = sessionListener.createConsumer(this.queue);
 			consumer.setMessageListener(message -> {
 				try {
+					System.out.println("Request received");
 					reply(session, message);
+					System.out.println("Response sent");
 				} catch (JMSException e) {
 					e.printStackTrace();
 				}
@@ -204,7 +203,6 @@ public class Analyzer {
 	 * @param msg the received message
 	 * @throws JMSException
 	 */
-	@SuppressWarnings("JavaDoc")
 	private void reply(Session session, Message msg) throws JMSException {
 		ObjectMessage message = (ObjectMessage) msg;
 		UUID uuid = (UUID) message.getObject();
@@ -233,6 +231,7 @@ public class Analyzer {
 				analyze(answer);
 			}
 		}	
+		System.out.println("Report updated");
 	}
 	
 	/**
@@ -314,11 +313,11 @@ public class Analyzer {
 		@Override
 		public void notify(RemoteEvent event) {
 			try {
+				System.out.println("Answer received");
 				Answer answer_type = (Answer) event.getRegistrationObject().get();
 				Entry entry = Analyzer.this.space.read(answer_type, null, Long.MAX_VALUE);
 				Answer answer = (Answer) entry;
 				Analyzer.this.readAnswer(answer);
-
 			} catch (IOException | TransactionException | UnusableEntryException | InterruptedException | ClassNotFoundException e) {
 				e.printStackTrace();
 			}
