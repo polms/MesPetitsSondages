@@ -10,11 +10,15 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
 import javax.jms.Queue;
 import javax.jms.Session;
 
+import fr.ensibs.sondages.analyzer.Report;
 import fr.ensibs.joram.Connector;
 import fr.ensibs.joram.Helper;
 import fr.ensibs.sondages.questions.Question;
@@ -38,6 +42,29 @@ public class CreateSounderImpl implements CreateSounder {
 		this.session = connector.createSession();
 		this.sounders = new ArrayList<>();
 		this.queue = Helper.getQueue(session, "request");
+		
+		Session sessionListener = Connector.getInstance().createSession();
+		try {
+			MessageConsumer consumer = sessionListener.createConsumer(this.queue);
+			consumer.setMessageListener(new MessageListener() {
+				@Override
+				public void onMessage(Message message) {
+					ObjectMessage m = (ObjectMessage) message;
+					
+					try {
+						Report r=(Report)m.getObject();
+						System.out.println(r.toString());
+						
+					} catch (JMSException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+				}
+		    });  
+		} catch (JMSException e) {
+			e.printStackTrace();
+		}
 		
 	}
 	

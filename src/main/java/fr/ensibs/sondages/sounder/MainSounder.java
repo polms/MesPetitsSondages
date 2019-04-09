@@ -2,6 +2,7 @@ package fr.ensibs.sondages.sounder;
 
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.UUID;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -18,7 +19,6 @@ public class MainSounder {
 	
 	private int port;
 	private String host;
-	private Queue maqueue;
 	private CreateSounderImpl createsounder;
 	private Poll poll;
 	
@@ -31,7 +31,6 @@ public class MainSounder {
 		System.out.println("<server_port> the number of the server port");
 		System.exit(0);
 	}
-
 	public static void main(String[] args) {
 		if (args.length != 2 || args.equals("-h"))
 			usage();
@@ -60,12 +59,12 @@ public class MainSounder {
 
 	
 	public void run() throws Exception {
-		receiveQueue();
+		
 		   System.out.println("Enter commands:"
 	                + "\n CREATE*<name>                                             to create a new questioner"
 	                + "\n CREATEQUESTION*<question>*<name>*<Free/YesNo/Bounded>          to ask a new question"
 	                + "\n LISTQUESTION*<name>                                       to obtain all the question of the user"
-	                + "\n GETANSWER*<name>                                          to obtain an answer"
+	                + "\n GETANSWER*<name>*<numquestion>                            to obtain an answer"
 	                );
 		   
 	        Scanner scanner = new Scanner(System.in);
@@ -127,36 +126,28 @@ public class MainSounder {
 	                	if (this.createsounder.exist(command[1])) {
 	                		 ArrayList<Question> question =this.createsounder.getSounder(this.createsounder.getId(command[1])).getQuestion();
 	 	                    System.out.println("questions:");
-							for (Question question1 : question) {
-								System.out.println("- " + question1.getQuestion());
-							}
+
+	 	                    for(int i=0; i<question.size();i++) {
+	 	                    	System.out.println(i+"- "+ question.get(i).getQuestion());
+	 	                    }
+
 	                		
 	                	}
 	                   
 	                }
 	                    break;
 	                case "GETANSWER": {
-	                	if(this.createsounder.exist(command[1])){
+
+	                	if(this.createsounder.exist(command[1])&& this.createsounder.getSounder(this.createsounder.getId(command[1])).getQuestion().size()>Integer.parseInt(command[2])){
+	                		//demande    1) nom     2)idquestion
+	                		Sounder sondeur= this.createsounder.getSounder(this.createsounder.getId(command[1]));
 	                		
-	                	}
-	                	
-	                	
-	                	
-	                	
-	                	
-	                	
-	                	Sounder s =  this.createsounder.getSounder(this.createsounder.getId(command[1]));
-	                	ArrayList<Question> question =s.getQuestion();
-	                	for(int i=0; i<question.size();) {
-	                		if (question.get(i).getQuestion().contentEquals(command[2])) {
-	                			this.createsounder.askAnswer(s.getId(), question.get(i).getID());
-	                		}
-	                	}
-	                	System.out.println("Cette question n'existe pas pour cet utilisateur");
-						for (Question question1 : question) {
-							System.out.println("- " + question1.getQuestion());
-						}
-	                    
+	                		UUID id = sondeur.getQuestion().get(Integer.parseInt(command[2])).getID();
+	                		this.createsounder.askAnswer(sondeur.getId(), id);
+	                		
+	                
+	                	}     
+
 	                }
 	                    break;
 	                
@@ -171,21 +162,5 @@ public class MainSounder {
 			
 		
 		}
-	private void receiveQueue() {
-		System.setProperty("java.naming.factory.initial", "fr.dyade.aaa.jndi2.client.NamingContextFactory");
-		System.setProperty("java.naming.factory.host", this.host);
-		System.setProperty("java.naming.factory.port", String.valueOf(this.port));
-		
-		Session session = Connector.getInstance().createSession();
-		
-		this.maqueue = Helper.getQueue(session, "response");
-		
-		Session sessionListener = Connector.getInstance().createSession();
-		try {
-			MessageConsumer consumer = sessionListener.createConsumer(this.maqueue);
-			consumer.setMessageListener(message -> System.out.println(message.toString()));
-		} catch (JMSException e) {
-			e.printStackTrace();
-		}
-	}
+
 }
