@@ -28,14 +28,10 @@ To build the project:
 
 To launch the application:
 
-    java -jar target/sondages-1.0.jar
-    
-You can then launch separately each part of the application:
+    java -jar target/sondages-1.0.jar (sounder|answerer|analyzer) [args]
 
-	(sounder|answerer|analyzer) [args]
+* To launch the sounder : `java -jar target/sondages-1.0.jar sounder <jms_server_host> <jms_server_port>`
 	
-* To launch the sounder : `sounder <jms_server_host> <jms_server_port>`
+* To launch the answerer : `java -jar target/sondages-1.0.jar answerer <js_server_host> <js_server_port> <jms_server_host> <jms_server_port>`
 	
-* To launch the answerer : `answerer <js_server_host> <js_server_port> <jms_server_host> <jms_server_port>`
-	
-* To launch the analyzer : `analyzer <js_server_host> <js_server_port> <jms_server_host> <jms_server_port>`
+* To launch the analyzer : `java -jar target/sondages-1.0.jar analyzer <js_server_host> <js_server_port> <jms_server_host> <jms_server_port>`
