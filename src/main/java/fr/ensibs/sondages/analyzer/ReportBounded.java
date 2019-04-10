@@ -35,7 +35,7 @@ public class ReportBounded extends Report {
 	 * @param answer
 	 */
 	public void addAnswer(int answer) {
-		answers[answer]++;
+		answers[answer-1]++;
 		average(answer);
 	}
 	
